@@ -1,0 +1,25 @@
+<!-- templates/about/author.html -->
+{% extends "base.html" %}
+{% block title %}Об авторе проекта{% endblock %}
+{% block content %}
+
+    <div class="row">
+      <aside class="col-12 col-md-4">
+          <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+              <h3>"Hello, world"</h3>
+              <p>Меня зовут Владимир и это мой первый раз &#128512. Я учусь.</p>
+<p>Много кружек кофе пропито пока я работал над этим проектом.</p>
+<p>И много ночей проведено не так как хотелось бы, а за ноутбуком.</p>
+<p>Но все проходит, и это пройдет, и проект The Last Social Media You'll Ever
+    Need <span style="color:red">Ya</span>tube будет закончен &#129395</p>
+          </li>
+          </ul>
+      </aside>
+    <article class="col-12 col-md-8">
+<h5>Фото рабочего места в соответствии с требованиями задания &#128522:</h5>
+        {% load static %}
+        <img src="{% static 'img/IMG_20220106_201722.jpg' %}" width="960" height="480" class="d-inline-block align-top" alt="">
+    </article>
+    </div>
+{% endblock %}
