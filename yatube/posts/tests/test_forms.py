@@ -57,7 +57,7 @@ class PostFormTests(TestCase):
     def test_edit_post(self):
         """Валидная форма изменяет запись поста."""
         # Создадим запись 2
-        second_post = Post.objects.create(
+        Post.objects.create(
             author=self.user,
             text='Текст тестовой записи2',
             group=self.group,
