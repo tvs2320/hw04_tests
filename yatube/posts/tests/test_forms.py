@@ -1,4 +1,3 @@
-from django.http import request
 
 from .test_models import Post, Group
 from django.contrib.auth import get_user_model
@@ -76,6 +75,7 @@ class PostFormTests(TestCase):
         self.assertTrue(
             Post.objects.filter(
                 text='Изменение поста',
-                ).exists())
+                ).exists()
+        )
         # Проверяем, что количество постов не изменилось
         self.assertEqual(Post.objects.count(), 1)
