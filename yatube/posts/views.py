@@ -57,7 +57,7 @@ def post_detail(request, post_id):
 
 @login_required
 def post_create(request):
-    form = PostForm(request.POST or None)
+    form = PostForm(request.POST or None, request.FILES)
     if request.method == 'POST':
         if form.is_valid():
             user = request.user
@@ -72,7 +72,9 @@ def post_create(request):
 @login_required
 def post_edit(request, post_id: int):
     post = get_object_or_404(Post, pk=post_id)
-    form = PostForm(request.POST or None, instance=post)
+    form = PostForm(request.POST or None,
+                    files=request.FILES or None,
+                    instance=post)
     user = request.user
 
     if post.author != request.user:

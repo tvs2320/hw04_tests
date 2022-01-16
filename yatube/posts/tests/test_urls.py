@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from .test_models import Post, Group
@@ -18,9 +20,8 @@ class PostsURLTests(TestCase):
 
     def setUp(self):
         self.post = Post.objects.create(
-            author=self.user,  # .get(id=1)
+            author=self.user,
             text='Текст тестовой записи',
-            # post_id=PostsURLTests.get(id=1)
         )
         self.group = Group.objects.create(
             title='Заголовок тестовой группы',
@@ -28,39 +29,32 @@ class PostsURLTests(TestCase):
             description='Описание тестовой группы',
         )
 
-    # Проверяем общедоступные страницы
+    # Проверяем страницы доступные неавторизованному пользователю
     def test_homepage(self) -> None:
-        """Страница / доступна любому пользователю."""
-        response = self.guest_client.get('/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_group_page(self) -> None:
-        """Страница group/<slug:slug>/ доступна любому пользователю."""
-        response = self.guest_client.get('/group/test-slug/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_profile_page(self) -> None:
-        """Страница profile/<str:username>/ доступна любому пользователю."""
-        response = self.guest_client.get('/profile/guest_test_user/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_post_detail_page(self) -> None:
-        """Страница posts/<int:post_id>/ доступна любому пользователю."""
-        response = self.guest_client.get('/posts/1/')
-        self.assertEqual(response.status_code, 200)
+        """Проверяем страницы доступные неавторизованному пользователю"""
+        dict_url_status = {
+            '/': HTTPStatus.OK,
+            '/group/test-slug/': HTTPStatus.OK,
+            '/profile/guest_test_user/': HTTPStatus.OK,
+            '/posts/1/': HTTPStatus.OK
+        }
+        for url, status in dict_url_status.items():
+            with self.subTest(status=HTTPStatus):
+                response = self.authorized_client.get(url)
+                self.assertEqual(response.status_code, status)
 
     # Проверяем страницы доступные авторизованным пользователям
     def test_create_page(self) -> None:
         """Страница create/ доступна авторизированному пользователю."""
         response = self.authorized_client.get('/create/')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     # Проверяем страницу редактирования поста, доступную только автору
     def test_edit_post_page(self) -> None:
         """Страница posts/<pk>/edit/ доступна
         авторизированному автору поста."""
         response = self.authorized_client.get('/posts/1/edit/')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     # Проверяем редиректы для неавторизованного пользователя
     def test_create_page_url_redirect_guest_on_login(self) -> None:
@@ -84,29 +78,19 @@ class PostsURLTests(TestCase):
     # Проверка вызываемых шаблонов
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
-        templates_url_names = {
-            'posts/index.html': '/',
-            'posts/group_list.html': '/group/test-slug/',
-            'posts/profile.html': '/profile/guest_test_user/',
-            'posts/post_detail.html': '/posts/1/',
+        dict_url_template = {
+            '/': 'posts/index.html',
+            '/group/test-slug/': 'posts/group_list.html',
+            '/profile/guest_test_user/': 'posts/profile.html',
+            '/posts/1/': 'posts/post_detail.html',
+            '/create/': 'posts/create_post.html',
+            '/posts/1/edit/': 'posts/create_post.html',
         }
-        for template, url in templates_url_names.items():
-            with self.subTest(url=url):
+        for url, template in dict_url_template.items():
+            with self.subTest(template=template):
                 response = self.authorized_client.get(url)
                 self.assertTemplateUsed(response, template)
 
-    # Проверка вызываемых шаблонов для страницы новой записи
-    def test_create_page_uses_correct_template(self):
-        """Страница по адресу / использует шаблон create_post.html."""
-        response = self.authorized_client.get('/create/')
-        self.assertTemplateUsed(response, 'posts/create_post.html')
-
-    # Проверка вызываемых шаблонов для страницы редактирования записи
-    def test_edit_page_uses_correct_template(self):
-        """Страница по адресу / использует шаблон create_post.html."""
-        response = self.authorized_client.get('/posts/1/edit/')
-        self.assertTemplateUsed(response, 'posts/create_post.html')
-
     def test_wrong_url_returns_404(self):
         response = self.guest_client.get('something/wrong/url/')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)

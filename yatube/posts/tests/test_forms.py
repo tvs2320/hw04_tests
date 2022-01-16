@@ -1,8 +1,10 @@
+from django.http import request
+
 from .test_models import Post, Group
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
-
+from http import HTTPStatus
 from ..forms import PostForm
 
 User = get_user_model()
@@ -29,7 +31,7 @@ class PostFormTests(TestCase):
         )
 
         self.post = Post.objects.create(
-            author=self.user,  # .get(id=1)
+            author=self.user,
             text='Текст тестовой записи',
             group=self.group,
         )
@@ -51,31 +53,29 @@ class PostFormTests(TestCase):
         # Проверяем, сработал ли редирект
         self.assertRedirects(response, reverse(
             'posts:profile', kwargs={'username': 'guest_test_user'}))
-        # Проверяем, увеличилось ли число постов
+        # Проверяем, создался ли 2й пост, увеличилось ли число постов
+        second = Post.objects.get(pk=2)
+        print(str(second))
+        self.assertEqual(str(second), 'Тестовый текст')
         self.assertEqual(Post.objects.count(), posts_count + 1)
 
     def test_edit_post(self):
         """Валидная форма изменяет запись поста."""
-        # Создадим запись 2
-        Post.objects.create(
-            author=self.user,
-            text='Текст тестовой записи2',
-            group=self.group,
-        )
-
         # Подготавливаем данные для передачи в форму, редактируем пост
         form_data = {
-            'text': 'Изменение текста записи',
-            'group': self.group,
+            'text': 'Изменение поста',
         }
-        # Проверяем, что текст поста изменился
-        self.assertNotEqual(Post.text, form_data['text'])
-        # Проверяем, что количество постов не изменилось
-        self.assertEqual(Post.objects.count(), 2)
-        # Проверяем, что вызывается страница детализации поста
         response = self.authorized_client.post(
-            reverse('posts:post_detail', kwargs={'post_id': 1}),
+            reverse('posts:post_edit',
+                    kwargs={'post_id': 1}),
             data=form_data,
             follow=True
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        # Проверяем, что запись поста отредактировалась
+        self.assertTrue(
+            Post.objects.filter(
+                text='Изменение поста',
+                ).exists())
+        # Проверяем, что количество постов не изменилось
+        self.assertEqual(Post.objects.count(), 1)

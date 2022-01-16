@@ -27,7 +27,7 @@
           {% include 'includes/form_errors.html' %}
           {% endif %}
 
-            <form method="post"
+            <form method="post" enctype="multipart/form-data"
             {% if form.instance.id %}
                 action="{% url 'posts:post_edit' post_id=post.pk %}"
             {% else %}

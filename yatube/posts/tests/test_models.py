@@ -17,13 +17,14 @@ class PostModelTest(TestCase):
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовая запись',
+            text='Тест'*5,
         )
 
     def test_models_have_correct_post_names(self):
-        """Проверяем, что у моделей корректно работает __str__."""
-        post = PostModelTest.post.text
-        self.assertEqual(str(post), post)
+        """Проверяем, что у моделей корректно работает __str__, строковое
+        представление выводит 15 символов текста поста."""
+        post = PostModelTest.post
+        self.assertEqual(str(post), post.text[:15])
 
     def test_models_have_correct_group_names(self):
         """Проверяем, что у моделей корректно работает __str__."""
