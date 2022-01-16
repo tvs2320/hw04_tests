@@ -72,10 +72,6 @@ class PostFormTests(TestCase):
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
         # Проверяем, что запись поста отредактировалась
-        self.assertTrue(
-            Post.objects.filter(
-                text='Изменение поста',
-                ).exists()
-        )
+        self.assertTrue(Post.objects.filter(text='Изменение поста').exists())
         # Проверяем, что количество постов не изменилось
         self.assertEqual(Post.objects.count(), 1)
