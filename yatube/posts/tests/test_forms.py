@@ -1,39 +1,18 @@
 
-from .test_models import Post, Group
-from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
-from django.urls import reverse
 from http import HTTPStatus
-from ..forms import PostForm
+
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+
+from .test_models import BaseTest, Post
 
 User = get_user_model()
 
 
-class PostFormTests(TestCase):
+class PostFormTests(BaseTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-
-        cls.guest_client = Client()
-        cls.user = User.objects.create_user(username='guest_test_user')
-
-        cls.authorized_client = Client()
-        cls.authorized_client.force_login(cls.user)
-
-        cls.form = PostForm()
-
-    def setUp(self):
-        self.group = Group.objects.create(
-            title='Заголовок тестовой группы',
-            slug='test-slug',
-            description='Описание тестовой группы',
-        )
-
-        self.post = Post.objects.create(
-            author=self.user,
-            text='Текст тестовой записи',
-            group=self.group,
-        )
 
     def test_create_post(self):
         """Валидная форма создает запись post в базе данных."""

@@ -1,33 +1,33 @@
 from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase, Client
-from .test_models import Post, Group
+
+from .test_models import BaseTest
 
 User = get_user_model()
 
 
-class PostsURLTests(TestCase):
+class PostsURLTests(BaseTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-
-        cls.guest_client = Client()
-        cls.user = User.objects.create_user(username='guest_test_user')
-
-        cls.authorized_client = Client()
-        cls.authorized_client.force_login(cls.user)
-
-    def setUp(self):
-        self.post = Post.objects.create(
-            author=self.user,
-            text='Текст тестовой записи',
-        )
-        self.group = Group.objects.create(
-            title='Заголовок тестовой группы',
-            slug='test-slug',
-            description='Описание тестовой группы',
-        )
+    #
+    #     cls.guest_client = Client()
+    #     cls.user = User.objects.create_user(username='guest_test_user')
+    #
+    #     cls.authorized_client = Client()
+    #     cls.authorized_client.force_login(cls.user)
+    #
+    # def setUp(self):
+    #     self.post = Post.objects.create(
+    #         author=self.user,
+    #         text='Текст тестовой записи',
+    #     )
+    #     self.group = Group.objects.create(
+    #         title='Заголовок тестовой группы',
+    #         slug='test-slug',
+    #         description='Описание тестовой группы',
+    #     )
 
     # Проверяем страницы доступные неавторизованному пользователю
     def test_homepage(self) -> None:

@@ -1,32 +1,47 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import Client, TestCase
 
 from ..models import Group, Post
 
 User = get_user_model()
 
 
-class PostModelTest(TestCase):
+class BaseTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create_user(username='auth')
+
+        cls.guest_client = Client()
+        cls.user = User.objects.create_user(username='guest_test_user')
+
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user)
+
         cls.group = Group.objects.create(
-            title='Тестовая группа',
-            description='Тестовое описание',
+            title='Заголовок тестовой группы',
+            slug='test-slug',
+            description='Описание тестовой группы',
         )
+
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тест' * 5,
+            text='Текст тестовой записи',
+            group=cls.group,
         )
+
+
+class PostModelTest(BaseTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
 
     def test_models_have_correct_post_names(self):
         """Проверяем, что у моделей корректно работает __str__, строковое
         представление выводит 15 символов текста поста."""
-        post = PostModelTest.post
-        self.assertEqual(str(post), post.text[:15])
+        self.post = PostModelTest.post
+        self.assertEqual(str(self.post), self.post.text[:15])
 
     def test_models_have_correct_group_names(self):
         """Проверяем, что у моделей корректно работает __str__."""
-        group = PostModelTest.group
-        self.assertEqual(str(group), group.title)
+        self.group = PostModelTest.group
+        self.assertEqual(str(self.group), PostModelTest.group.title)

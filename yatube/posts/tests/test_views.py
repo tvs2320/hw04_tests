@@ -1,38 +1,27 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
 from django.urls import reverse
 
-from .test_models import Post, Group
+# from tests.fixtures.fixture_data import group
+# from tests.fixtures.fixture_user import user
+
+from .test_models import BaseTest, Group, Post
 
 User = get_user_model()
 
 
-class PostsViewsTests(TestCase):
+class PostsViewsTests(BaseTest):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-
-        cls.guest_client = Client()
-        cls.user = User.objects.create_user(username='guest_test_user')
-
-        cls.authorized_client = Client()
-        cls.authorized_client.force_login(cls.user)
-
-    def setUp(self) -> None:
-        self.group = Group.objects.create(
-            title='Заголовок тестовой группы',
-            slug='test-slug',
-            description='Описание тестовой группы',
-        )
-
-        number_of_posts = 13
-        for self.post in range(number_of_posts):
+        # Создаем к тестовому посту еще 12 дополнительно"
+        number_of_posts = 12
+        for post in range(number_of_posts):
             Post.objects.create(
-                author=self.user,
+                author=cls.user,
                 text='Текст тестовой записи',
-                group=self.group,
+                group=cls.group,
             )
 
     # Проверяем используемые шаблоны
@@ -67,6 +56,7 @@ class PostsViewsTests(TestCase):
         на второй странице - 3 поста"""
         # Собираем в словарь пары "reverse(name):
         # количество постов на странице"
+        print(f'постов для проверки паджинации: {Post.objects.count()}')
         dict_pages_page_limit = {
             reverse('posts:index'): settings.PAGE_LIMIT,
             reverse('posts:index') + '?page=2': 3,
