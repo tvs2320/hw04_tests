@@ -33,8 +33,7 @@ class PostFormTests(BaseTest):
             'posts:profile', kwargs={'username': 'guest_test_user'}))
         # Проверяем, создался ли 2й пост, увеличилось ли число постов
         second = Post.objects.get(pk=2)
-        print(str(second))
-        self.assertEqual(str(second), 'Тестовый текст')
+        self.assertEqual(str(second), form_data['text'])
         self.assertEqual(Post.objects.count(), posts_count + 1)
 
     def test_edit_post(self):
@@ -51,6 +50,6 @@ class PostFormTests(BaseTest):
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
         # Проверяем, что запись поста отредактировалась
-        self.assertTrue(Post.objects.filter(text='Изменение поста').exists())
+        self.assertTrue(Post.objects.filter(text=form_data['text']).exists())
         # Проверяем, что количество постов не изменилось
         self.assertEqual(Post.objects.count(), 1)

@@ -11,26 +11,9 @@ class PostsURLTests(BaseTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-    #
-    #     cls.guest_client = Client()
-    #     cls.user = User.objects.create_user(username='guest_test_user')
-    #
-    #     cls.authorized_client = Client()
-    #     cls.authorized_client.force_login(cls.user)
-    #
-    # def setUp(self):
-    #     self.post = Post.objects.create(
-    #         author=self.user,
-    #         text='Текст тестовой записи',
-    #     )
-    #     self.group = Group.objects.create(
-    #         title='Заголовок тестовой группы',
-    #         slug='test-slug',
-    #         description='Описание тестовой группы',
-    #     )
 
     # Проверяем страницы доступные неавторизованному пользователю
-    def test_homepage(self) -> None:
+    def test_guests_pages(self) -> None:
         """Проверяем страницы доступные неавторизованному пользователю"""
         dict_url_status = {
             '/': HTTPStatus.OK,
@@ -40,7 +23,7 @@ class PostsURLTests(BaseTest):
         }
         for url, status in dict_url_status.items():
             with self.subTest(status=HTTPStatus):
-                response = self.authorized_client.get(url)
+                response = self.guest_client.get(url)
                 self.assertEqual(response.status_code, status)
 
     # Проверяем страницы доступные авторизованным пользователям

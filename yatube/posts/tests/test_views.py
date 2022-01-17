@@ -56,7 +56,8 @@ class PostsViewsTests(BaseTest):
         на второй странице - 3 поста"""
         # Собираем в словарь пары "reverse(name):
         # количество постов на странице"
-        print(f'постов для проверки паджинации: {Post.objects.count()}')
+        print(f'Создадим {Post.objects.count()} постов '
+              f'для проверки паджинации')
         dict_pages_page_limit = {
             reverse('posts:index'): settings.PAGE_LIMIT,
             reverse('posts:index') + '?page=2': 3,
